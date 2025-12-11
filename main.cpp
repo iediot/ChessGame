@@ -3,6 +3,8 @@
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <iostream>
 
+#include "piece_moves.h"
+
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_PNG);
@@ -72,7 +74,7 @@ int main() {
 
             if (e.type == SDL_MOUSEBUTTONDOWN) {
                 int col = e.button.x / cellSize;
-                int row = e. button.y / cellSize;
+                int row = e.button.y / cellSize;
 
                 if (piece != 0) {
                     if (row >= 0 && row < 8 && col >= 0 && col < 8) {

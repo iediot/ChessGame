@@ -56,6 +56,13 @@ build CMakeFiles/Chess.dir/main.cpp.o: CXX_COMPILER__Chess_unscanned_Debug /home
   OBJECT_DIR = CMakeFiles/Chess.dir
   OBJECT_FILE_DIR = CMakeFiles/Chess.dir
 
+build CMakeFiles/Chess.dir/piece_moves.cpp.o: CXX_COMPILER__Chess_unscanned_Debug /home/edi/CLionProjects/Chess/piece_moves.cpp || cmake_object_order_depends_target_Chess
+  CONFIG = Debug
+  DEP_FILE = CMakeFiles/Chess.dir/piece_moves.cpp.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles/Chess.dir
+  OBJECT_FILE_DIR = CMakeFiles/Chess.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Chess
@@ -64,7 +71,7 @@ build CMakeFiles/Chess.dir/main.cpp.o: CXX_COMPILER__Chess_unscanned_Debug /home
 #############################################
 # Link the executable Chess
 
-build Chess: CXX_EXECUTABLE_LINKER__Chess_Debug CMakeFiles/Chess.dir/main.cpp.o
+build Chess: CXX_EXECUTABLE_LINKER__Chess_Debug CMakeFiles/Chess.dir/main.cpp.o CMakeFiles/Chess.dir/piece_moves.cpp.o
   CONFIG = Debug
   DEP_FILE = CMakeFiles/Chess.dir/link.d
   FLAGS = -g
