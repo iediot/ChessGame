@@ -5,11 +5,12 @@
 #include <vector>
 
 std::vector<std::pair<int, int>> getValidMoves(int board[8][8], int row, int col);
-std::vector<std::pair<int, int>> getPawnMoves(int board[8][8], int row, int col, bool isWhite);
-std::vector<std::pair<int, int>> getRookMoves(int board[8][8], int row, int col, bool isWhite);
-std::vector<std::pair<int, int>> getKnightMoves(int board[8][8], int row, int col, bool isWhite);
-std::vector<std::pair<int, int>> getBishopMoves(int board[8][8], int row, int col, bool isWhite);
-std::vector<std::pair<int, int>> getQueenMoves(int board[8][8], int row, int col, bool isWhite);
-std::vector<std::pair<int, int>> getKingMoves(int board[8][8], int row, int col, bool isWhite);
+std::vector<std::pair<int, int>> get_pawn_moves(int board[8][8], int row, int col, bool is_white);
+std::vector<std::pair<int, int>> get_rook_moves(int board[8][8], int row, int col, bool is_white);
+std::vector<std::pair<int, int>> get_knight_moves(int board[8][8], int row, int col, bool is_white);
+std::vector<std::pair<int, int>> get_bishop_moves(int board[8][8], int row, int col, bool is_white);
+std::vector<std::pair<int, int>> get_queen_moves(int board[8][8], int row, int col, bool is_white);
+std::vector<std::pair<int, int>> get_king_moves(int board[8][8], int row, int col, bool is_white);
+bool is_square_attacked(int board[8][8], int row, int col, bool by_white);
 
 #endif //CHESS_PIECE_MOVES_H

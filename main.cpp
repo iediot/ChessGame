@@ -9,7 +9,7 @@ int main() {
     SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_PNG);
 
-    int resolution = 800;
+    int resolution = 1000;
 
     auto window = SDL_CreateWindow("Chess", 100, 100, resolution, resolution, 0);
     auto renderer = SDL_CreateRenderer(window, -1, 0);

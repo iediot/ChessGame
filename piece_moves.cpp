@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <math.h>
+#include <setjmp.h>
 
 std::vector<std::pair<int, int>> getValidMoves(int board[8][8], int row, int col) {
     int piece = board[row][col];
@@ -14,26 +15,26 @@ std::vector<std::pair<int, int>> getValidMoves(int board[8][8], int row, int col
     switch (type)
     {
     case 1:
-        return getPawnMoves(board, row, col, piece > 0);
+        return get_pawn_moves(board, row, col, piece > 0);
     case 2:
-        return getRookMoves(board, row, col, piece > 0);
+        return get_rook_moves(board, row, col, piece > 0);
     case 3:
-        return getKnightMoves(board, row, col, piece > 0);
+        return get_knight_moves(board, row, col, piece > 0);
     case 4:
-        return getBishopMoves(board, row, col, piece > 0);
+        return get_bishop_moves(board, row, col, piece > 0);
     case 5:
-        return getQueenMoves(board, row, col, piece > 0);
+        return get_queen_moves(board, row, col, piece > 0);
     case 6:
-        return getKingMoves(board, row, col, piece > 0);
+        return get_king_moves(board, row, col, piece > 0);
     default:
         return {};
     }
 }
 
-std::vector<std::pair<int, int>> getPawnMoves(int board[8][8], int row, int col, bool isWhite) {
+std::vector<std::pair<int, int>> get_pawn_moves(int board[8][8], int row, int col, bool is_white) {
     std::vector<std::pair<int, int>> valid_moves;
 
-    if (isWhite) {
+    if (is_white) {
         if (row - 1 >= 0 && board[row - 1][col] == 0) {
             valid_moves.push_back({row - 1, col});
             if (row == 6 && board[row - 2][col] == 0)
@@ -57,17 +58,17 @@ std::vector<std::pair<int, int>> getPawnMoves(int board[8][8], int row, int col,
     return valid_moves;
 }
 
-std::vector<std::pair<int, int>> getRookMoves(int board[8][8], int row, int col, bool isWhite) {
+std::vector<std::pair<int, int>> get_rook_moves(int board[8][8], int row, int col, bool is_white) {
     std::vector<std::pair<int, int>> valid_moves;
 
     for (int i = row - 1; i >= 0; i--) {
         if (board[i][col] == 0)
             valid_moves.push_back({i, col});
-        else if (board[i][col] < 0 && isWhite) {
+        else if (board[i][col] < 0 && is_white) {
             valid_moves.push_back({i, col});
             break;
         }
-        else if (board[i][col] > 0 && !isWhite) {
+        else if (board[i][col] > 0 && !is_white) {
             valid_moves.push_back({i, col});
             break;
         }
@@ -78,11 +79,11 @@ std::vector<std::pair<int, int>> getRookMoves(int board[8][8], int row, int col,
     for (int i = row + 1; i <= 7; i++) {
         if (board[i][col] == 0)
             valid_moves.push_back({i, col});
-        else if (board[i][col] < 0 && isWhite) {
+        else if (board[i][col] < 0 && is_white) {
             valid_moves.push_back({i, col});
             break;
         }
-        else if (board[i][col] > 0 && !isWhite) {
+        else if (board[i][col] > 0 && !is_white) {
             valid_moves.push_back({i, col});
             break;
         }
@@ -93,11 +94,11 @@ std::vector<std::pair<int, int>> getRookMoves(int board[8][8], int row, int col,
     for (int i = col - 1; i >= 0; i--) {
         if (board[row][i] == 0)
             valid_moves.push_back({row, i});
-        else if (board[row][i] < 0 && isWhite) {
+        else if (board[row][i] < 0 && is_white) {
             valid_moves.push_back({row, i});
             break;
         }
-        else if (board[row][i] > 0 && !isWhite) {
+        else if (board[row][i] > 0 && !is_white) {
             valid_moves.push_back({row, i});
             break;
         }
@@ -108,11 +109,11 @@ std::vector<std::pair<int, int>> getRookMoves(int board[8][8], int row, int col,
     for (int i = col + 1; i <= 7; i++) {
         if (board[row][i]== 0)
             valid_moves.push_back({row, i});
-        else if (board[row][i] < 0 && isWhite) {
+        else if (board[row][i] < 0 && is_white) {
             valid_moves.push_back({row, i});
             break;
         }
-        else if (board[row][i] > 0 && !isWhite) {
+        else if (board[row][i] > 0 && !is_white) {
             valid_moves.push_back({row, i});
             break;
         }
@@ -123,7 +124,7 @@ std::vector<std::pair<int, int>> getRookMoves(int board[8][8], int row, int col,
     return valid_moves;
 }
 
-std::vector<std::pair<int, int>> getKnightMoves(int board[8][8], int row, int col, bool isWhite) {
+std::vector<std::pair<int, int>> get_knight_moves(int board[8][8], int row, int col, bool is_white) {
     std::vector<std::pair<int, int>> valid_moves;
     int logical_moves[8][2] = {
         {-2, -1}, {-2, 1},
@@ -133,33 +134,33 @@ std::vector<std::pair<int, int>> getKnightMoves(int board[8][8], int row, int co
     };
 
     for (auto& logical_move : logical_moves) {
-        int newRow = row + logical_move[0];
-        int newCol = col + logical_move[1];
+        int new_row = row + logical_move[0];
+        int new_col = col + logical_move[1];
 
-        if (newRow >= 0 && newRow <= 7 && newCol >= 0 && newCol <= 7) {
-            if (board[newRow][newCol] == 0)
-                valid_moves.push_back({newRow, newCol});
-            else if (board[newRow][newCol] < 0 && isWhite)
-                valid_moves.push_back({newRow, newCol});
-            else if (board[newRow][newCol] > 0 && !isWhite)
-                valid_moves.push_back({newRow, newCol});
+        if (new_row >= 0 && new_row <= 7 && new_col >= 0 && new_col <= 7) {
+            if (board[new_row][new_col] == 0)
+                valid_moves.push_back({new_row, new_col});
+            else if (board[new_row][new_col] < 0 && is_white)
+                valid_moves.push_back({new_row, new_col});
+            else if (board[new_row][new_col] > 0 && !is_white)
+                valid_moves.push_back({new_row, new_col});
         }
     }
 
     return valid_moves;
 }
 
-std::vector<std::pair<int, int>> getBishopMoves(int board[8][8], int row, int col, bool isWhite) {
+std::vector<std::pair<int, int>> get_bishop_moves(int board[8][8], int row, int col, bool is_white) {
     std::vector<std::pair<int, int>> valid_moves;
 
     for (int i = 1; row - i >= 0 && col - i >= 0; i++) {
         if (board[row - i][col - i] == 0)
             valid_moves.push_back({row - i, col - i});
-        else if (board[row - i][col - i] < 0 && isWhite) {
+        else if (board[row - i][col - i] < 0 && is_white) {
             valid_moves.push_back({row - i, col - i});
             break;
         }
-        else if (board[row - i][col - i] > 0 && !isWhite) {
+        else if (board[row - i][col - i] > 0 && !is_white) {
             valid_moves.push_back({row - i, col - i});
             break;
         }
@@ -170,11 +171,11 @@ std::vector<std::pair<int, int>> getBishopMoves(int board[8][8], int row, int co
     for (int i = 1; row - i >= 0 && col + i <= 7; i++) {
         if (board[row - i][col + i] == 0)
             valid_moves.push_back({row - i, col + i});
-        else if (board[row - i][col + i] < 0 && isWhite) {
+        else if (board[row - i][col + i] < 0 && is_white) {
             valid_moves.push_back({row - i, col + i});
             break;
         }
-        else if (board[row - i][col + i] > 0 && !isWhite) {
+        else if (board[row - i][col + i] > 0 && !is_white) {
             valid_moves.push_back({row - i, col + i});
             break;
         }
@@ -185,11 +186,11 @@ std::vector<std::pair<int, int>> getBishopMoves(int board[8][8], int row, int co
     for (int i = 1; row + i <= 7 && col - i >= 0; i++) {
         if (board[row + i][col - i] == 0)
             valid_moves.push_back({row + i, col - i});
-        else if (board[row + i][col - i] < 0 && isWhite) {
+        else if (board[row + i][col - i] < 0 && is_white) {
             valid_moves.push_back({row + i, col - i});
             break;
         }
-        else if (board[row + i][col - i] > 0 && !isWhite) {
+        else if (board[row + i][col - i] > 0 && !is_white) {
             valid_moves.push_back({row + i, col - i});
             break;
         }
@@ -200,11 +201,11 @@ std::vector<std::pair<int, int>> getBishopMoves(int board[8][8], int row, int co
     for (int i = 1; row + i <= 7 && col + i <= 7; i++) {
         if (board[row + i][col + i] == 0)
             valid_moves.push_back({row + i, col + i});
-        else if (board[row + i][col + i] < 0 && isWhite) {
+        else if (board[row + i][col + i] < 0 && is_white) {
             valid_moves.push_back({row + i, col + i});
             break;
         }
-        else if (board[row + i][col + i] > 0 && !isWhite) {
+        else if (board[row + i][col + i] > 0 && !is_white) {
             valid_moves.push_back({row + i, col + i});
             break;
         }
@@ -215,14 +216,15 @@ std::vector<std::pair<int, int>> getBishopMoves(int board[8][8], int row, int co
     return valid_moves;
 }
 
-std::vector<std::pair<int, int>> getQueenMoves(int board[8][8], int row, int col, bool isWhite) {
-    std::vector<std::pair<int, int>> valid_moves = getRookMoves(board, row, col, isWhite);
-    std::vector<std::pair<int, int>> bishop_moves = getBishopMoves(board, row, col, isWhite);
+std::vector<std::pair<int, int>> get_queen_moves(int board[8][8], int row, int col, bool is_white) {
+    std::vector<std::pair<int, int>> valid_moves = get_rook_moves(board, row, col, is_white);
+    std::vector<std::pair<int, int>> bishop_moves = get_bishop_moves(board, row, col, is_white);
 
     valid_moves.insert(valid_moves.end(), bishop_moves.begin(), bishop_moves.end());
     return valid_moves;
 }
-std::vector<std::pair<int, int>> getKingMoves(int board[8][8], int row, int col, bool isWhite) {
+
+std::vector<std::pair<int, int>> get_king_moves(int board[8][8], int row, int col, bool is_white) {
     std::vector<std::pair<int, int>> valid_moves;
     int logical_moves[8][2] = {
         {-1, -1},   {-1, 0},  {-1, 1},
@@ -231,18 +233,120 @@ std::vector<std::pair<int, int>> getKingMoves(int board[8][8], int row, int col,
     };
 
     for (auto& logical_move : logical_moves) {
-        int newRow = row + logical_move[0];
-        int newCol = col + logical_move[1];
+        int new_row = row + logical_move[0];
+        int new_col = col + logical_move[1];
+        bool attacked_square = is_square_attacked(board, new_row, new_col, !is_white);
 
-        if (newRow >= 0 && newRow <= 7 && newCol >= 0 && newCol <= 7) {
-            if (board[newRow][newCol] == 0)
-                valid_moves.push_back({newRow, newCol});
-            else if (board[newRow][newCol] < 0 && isWhite)
-                valid_moves.push_back({newRow, newCol});
-            else if (board[newRow][newCol] > 0 && !isWhite)
-                valid_moves.push_back({newRow, newCol});
+        if (new_row >= 0 && new_row <= 7 && new_col >= 0 && new_col <= 7) {
+            if (board[new_row][new_col] == 0 && !attacked_square)
+                    valid_moves.push_back({new_row, new_col});
+            else if (board[new_row][new_col] < 0 && is_white && !attacked_square)
+                valid_moves.push_back({new_row, new_col});
+            else if (board[new_row][new_col] > 0 && !is_white && !attacked_square)
+                valid_moves.push_back({new_row, new_col});
         }
     }
 
     return valid_moves;
+}
+
+bool is_square_attacked(int board[8][8], int row, int col, bool by_white) {
+    auto in_bounds = [](int x, int y){
+      return x >= 0 && x <= 7 && y >= 0 && y <= 7;
+    };
+
+    // pawns
+    if (by_white) {
+        if (in_bounds(row + 1, col - 1) && board[row + 1][col - 1] == 1)
+            return true;
+        if (in_bounds(row + 1, col + 1) && board[row + 1][col + 1] == 1)
+            return true;
+    } else {
+        if (in_bounds(row - 1, col - 1) && board[row - 1][col - 1] == -1)
+            return true;
+        if (in_bounds(row - 1, col + 1) && board[row - 1][col + 1] == -1)
+            return true;
+    }
+
+    // knights
+    int logical_moves[8][2] = {
+        {-2, -1}, {-2, 1},
+        {-1, -2}, {-1, 2},
+        {1, -2},  {1, 2},
+        {2, -1},  {2, 1}
+    };
+
+    for (auto& logical_move : logical_moves) {
+        int new_row = row + logical_move[0];
+        int new_col = col + logical_move[1];
+        if (!in_bounds(new_row, new_col))
+            continue;
+        if (by_white && board[new_row][new_col] == 3) return true;
+        if (!by_white && board[new_row][new_col] == -3) return true;
+    }
+
+    // rook or queen
+    int orthogonal[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+    for (auto &dir : orthogonal) {
+        int new_row = row + dir[0];
+        int new_col = col + dir[1];
+
+        while (in_bounds(new_row, new_col)) {
+            int piece = board[new_row][new_col];
+            if (piece != 0) {
+                int abs_piece = std::abs(piece);
+                if (by_white) {
+                    if (piece > 0 && (abs_piece == 2 || abs_piece == 5))
+                        return true;
+                } else {
+                    if (piece < 0 && (abs_piece == 2 || abs_piece == 5))
+                        return true;
+                }
+                break;
+            }
+            new_row += dir[0];
+            new_col += dir[1];
+        }
+    }
+
+    // bishop or queen
+    int diagonal[4][2] = {{-1,-1},{-1,1},{1,-1},{1,1}};
+    for (auto &dir : diagonal) {
+        int new_row = row + dir[0];
+        int new_col = col + dir[1];
+
+        while (in_bounds(new_row, new_col)) {
+            int piece = board[new_row][new_col];
+            if (piece != 0) {
+                int abs_piece = std::abs(piece);
+                if (by_white) {
+                    if (piece > 0 && (abs_piece == 4 || abs_piece == 5))
+                        return true;
+                } else {
+                    if (piece < 0 && (abs_piece == 4 || abs_piece == 5))
+                        return true;
+                }
+                break;
+            }
+            new_row += dir[0];
+            new_col += dir[1];
+        }
+    }
+
+    // opp king
+    for (int dir_row = -1; dir_row <= 1; dir_row++) {
+        for (int dir_col = -1; dir_col <= 1; dir_col++) {
+            if (dir_row == 0 && dir_col == 0)
+                continue;
+            int new_row = row + dir_row;
+            int new_col = col + dir_col;
+            if (!in_bounds(new_row, new_col))
+                continue;
+            if (by_white && board[new_row][new_col] == 6)
+                return true;
+            if (!by_white && board[new_row][new_col] == -6)
+                return true;
+        }
+    }
+    return false;
 }
