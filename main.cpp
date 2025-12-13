@@ -64,6 +64,10 @@ int main() {
     bool dragging = false;
     bool white_turn = true;
     std::vector<std::pair<int, int>> valid_moves;
+    std::pair<int, int> white_king_pos = {7, 4};
+    std::pair<int, int> black_king_pos = {0, 4};
+    bool is_white_checked = false;
+    bool is_black_checked = false;
 
     bool running = true;
     while (running) {
@@ -86,9 +90,41 @@ int main() {
                     }
 
                     if (isValid) {
+                        auto prev_white_king = white_king_pos;
+                        auto prev_black_king = black_king_pos;
+                        int captured_piece = board[row][col];
+
                         board[selected_row][selected_col] = 0;
                         board[row][col] = piece;
-                        white_turn = !white_turn;
+
+                        if (std::abs(piece) == 6) {
+                            if (white_turn)
+                                white_king_pos = {row, col};
+                            else
+                                black_king_pos = {row, col};
+                        }
+
+                        bool mover_in_check;
+                        if (white_turn) {
+                            mover_in_check = is_square_attacked(board,
+                                white_king_pos.first, white_king_pos.second, false);
+                        } else {
+                            mover_in_check = is_square_attacked(board,
+                                black_king_pos.first, black_king_pos.second, true);
+                        }
+
+                        if (mover_in_check) {
+                            board[selected_row][selected_col] = piece;
+                            board[row][col] = captured_piece;
+                            white_king_pos = prev_white_king;
+                            black_king_pos = prev_black_king;
+                        } else {
+                            white_turn = !white_turn;
+                            is_white_checked = is_square_attacked(board,
+                                white_king_pos.first, white_king_pos.second, false);
+                            is_black_checked = is_square_attacked(board,
+                                black_king_pos.first, black_king_pos.second, true);
+                        }
                     }
                     piece = 0;
                     selected_row = -1;
@@ -110,7 +146,7 @@ int main() {
             }
 
             if (e.type == SDL_MOUSEMOTION && piece != 0) {
-                if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1)) {
+                if (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(1)) {
                     drag_x = e.motion.x;
                     drag_y = e.motion.y;
                     dragging = true;
@@ -131,9 +167,41 @@ int main() {
                     }
 
                     if (isValid) {
+                        auto prev_white_king = white_king_pos;
+                        auto prev_black_king = black_king_pos;
+                        int captured_piece = board[drop_row][drop_col];
+
                         board[selected_row][selected_col] = 0;
                         board[drop_row][drop_col] = piece;
-                        white_turn = !white_turn;
+
+                        if (std::abs(piece) == 6) {
+                            if (white_turn)
+                                white_king_pos = {drop_row, drop_col};
+                            else
+                                black_king_pos = {drop_row, drop_col};
+                        }
+
+                        bool mover_in_check;
+                        if (white_turn) {
+                            mover_in_check = is_square_attacked(board,
+                                white_king_pos.first, white_king_pos.second, false);
+                        } else {
+                            mover_in_check = is_square_attacked(board,
+                                black_king_pos.first, black_king_pos.second, true);
+                        }
+
+                        if (mover_in_check) {
+                            board[selected_row][selected_col] = piece;
+                            board[drop_row][drop_col] = captured_piece;
+                            white_king_pos = prev_white_king;
+                            black_king_pos = prev_black_king;
+                        } else {
+                            white_turn = !white_turn;
+                            is_white_checked = is_square_attacked(board,
+                                white_king_pos.first, white_king_pos.second, false);
+                            is_black_checked = is_square_attacked(board,
+                                black_king_pos.first, black_king_pos.second, true);
+                        }
                     }
                     piece = 0;
                     selected_row = -1;
@@ -162,10 +230,16 @@ int main() {
                     SDL_RenderFillRect(renderer, &square);
                 }
 
+                if ((is_white_checked && row == white_king_pos.first && col == white_king_pos.second) ||
+                    (is_black_checked && row == black_king_pos.first && col == black_king_pos.second)) {
+                    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
+                    SDL_RenderFillRect(renderer, &square);
+    }
+
                 if (!(dragging && row == selected_row && col == selected_col)) {
                     SDL_Texture* tex = getTexture(board[row][col]);
                     if (tex) {
-                        SDL_RenderCopy(renderer, tex, NULL, &square);
+                        SDL_RenderCopy(renderer, tex, nullptr, &square);
                     }
                 }
             }
