@@ -5,14 +5,18 @@
 
 #include "piece_moves.h"
 
-int main() {
+int main()
+{
     SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_PNG);
 
     int resolution = 1000;
 
     auto window = SDL_CreateWindow("Chess", 100, 100, resolution, resolution, 0);
-    auto renderer = SDL_CreateRenderer(window, -1, 0);
+    auto renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (!renderer) {
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    }
 
     int cell_size = resolution / 8;
 
@@ -42,19 +46,19 @@ int main() {
 
     auto getTexture = [&](int piece) -> SDL_Texture* {
         switch (piece) {
-            case  1: return white_pawn;
-            case -1: return black_pawn;
-            case  2: return white_rook;
-            case -2: return black_rook;
-            case  3: return white_knight;
-            case -3: return black_knight;
-            case  4: return white_bishop;
-            case -4: return black_bishop;
-            case  5: return white_queen;
-            case -5: return black_queen;
-            case  6: return white_king;
-            case -6: return black_king;
-            default: return nullptr;
+        case  1: return white_pawn;
+        case -1: return black_pawn;
+        case  2: return white_rook;
+        case -2: return black_rook;
+        case  3: return white_knight;
+        case -3: return black_knight;
+        case  4: return white_bishop;
+        case -4: return black_bishop;
+        case  5: return white_queen;
+        case -5: return black_queen;
+        case  6: return white_king;
+        case -6: return black_king;
+        default: return nullptr;
         }
     };
 
@@ -66,12 +70,28 @@ int main() {
     std::vector<std::pair<int, int>> valid_moves;
     std::pair<int, int> white_king_pos = {7, 4};
     std::pair<int, int> black_king_pos = {0, 4};
+    struct castling {
+        bool white_can_castle_kingside  = true;
+        bool white_can_castle_queenside = true;
+        bool black_can_castle_kingside  = true;
+        bool black_can_castle_queenside = true;
+    } castling;
     bool is_white_checked = false;
     bool is_black_checked = false;
 
     bool running = true;
     while (running) {
         SDL_Event e;
+
+        if (white_king_pos.first != 7 || white_king_pos.second != 4) {
+            castling.white_can_castle_kingside = false;
+            castling.white_can_castle_queenside = false;
+        }
+        if (black_king_pos.first != 0 || black_king_pos.second != 4) {
+            castling.black_can_castle_kingside = false;
+            castling.black_can_castle_queenside = false;
+        }
+
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT)
                 running = false;
@@ -82,6 +102,7 @@ int main() {
 
                 if (piece != 0) {
                     bool isValid = false;
+
                     for (auto& move : valid_moves) {
                         if (move.first == row && move.second == col) {
                             isValid = true;
@@ -120,12 +141,33 @@ int main() {
                             black_king_pos = prev_black_king;
                         } else {
                             white_turn = !white_turn;
+
+                            if (board[0][0] != -2 && castling.black_can_castle_queenside)
+                                castling.black_can_castle_queenside = false;
+                            if (board[0][7] != -2 && castling.black_can_castle_kingside)
+                                castling.black_can_castle_kingside = false;
+                            if (board[7][0] != 2 && castling.white_can_castle_queenside)
+                                castling.white_can_castle_queenside = false;
+                            if (board[7][7] != 2 && castling.white_can_castle_kingside)
+                                castling.white_can_castle_kingside = false;
+
                             is_white_checked = is_square_attacked(board,
                                 white_king_pos.first, white_king_pos.second, false);
                             is_black_checked = is_square_attacked(board,
                                 black_king_pos.first, black_king_pos.second, true);
                         }
                     }
+
+                    if (std::abs(piece) == 6 && std::abs(col - selected_col) == 2) {
+                        if (col == 6) {
+                            board[row][5] = board[row][7];
+                            board[row][7] = 0;
+                        } else if (col == 2) {
+                            board[row][3] = board[row][0];
+                            board[row][0] = 0;
+                        }
+                    }
+
                     piece = 0;
                     selected_row = -1;
                     selected_col = -1;
@@ -138,9 +180,27 @@ int main() {
                         selected_row = row;
                         selected_col = col;
                         piece = board[row][col];
-                        drag_x = e.button. x;
+                        drag_x = e.button.x;
                         drag_y = e.button.y;
                         valid_moves = getValidMoves(board, row, col);
+                        if (std::abs(piece) == 6)
+                        {
+                            if (piece > 0) {
+                                if (can_castle(board, true, true,
+                                castling.white_can_castle_queenside, false))
+                                    valid_moves.emplace_back(7, 2);
+                                if (can_castle(board, true, false,
+                                false, castling.white_can_castle_kingside))
+                                    valid_moves.emplace_back(7, 6);
+                            } else {
+                                if (can_castle(board, false, true,
+                                castling.black_can_castle_queenside, false))
+                                    valid_moves.emplace_back(0, 2);
+                                if (can_castle(board, false, false,
+                                false, castling.black_can_castle_kingside))
+                                    valid_moves.emplace_back(0, 6);
+                            }
+                        }
                     }
                 }
             }
@@ -155,7 +215,7 @@ int main() {
 
             if (e.type == SDL_MOUSEBUTTONUP) {
                 int drop_col = e.button.x / cell_size;
-                int drop_row = e. button.y / cell_size;
+                int drop_row = e.button.y / cell_size;
 
                 if (dragging && piece != 0) {
                     bool isValid = false;
@@ -197,12 +257,33 @@ int main() {
                             black_king_pos = prev_black_king;
                         } else {
                             white_turn = !white_turn;
+
+                            if (board[0][0] != -2 && castling.black_can_castle_queenside)
+                                castling.black_can_castle_queenside = false;
+                            if (board[0][7] != -2 && castling.black_can_castle_kingside)
+                                castling.black_can_castle_kingside = false;
+                            if (board[7][0] != 2 && castling.white_can_castle_queenside)
+                                castling.white_can_castle_queenside = false;
+                            if (board[7][7] != 2 && castling.white_can_castle_kingside)
+                                castling.white_can_castle_kingside = false;
+
                             is_white_checked = is_square_attacked(board,
                                 white_king_pos.first, white_king_pos.second, false);
                             is_black_checked = is_square_attacked(board,
                                 black_king_pos.first, black_king_pos.second, true);
                         }
                     }
+
+                    if (std::abs(piece) == 6 && std::abs(drop_col - selected_col) == 2) {
+                        if (drop_col == 6) {
+                            board[drop_row][5] = board[drop_row][7];
+                            board[drop_row][7] = 0;
+                        } else if (drop_col == 2) {
+                            board[drop_row][3] = board[drop_row][0];
+                            board[drop_row][0] = 0;
+                        }
+                    }
+
                     piece = 0;
                     selected_row = -1;
                     selected_col = -1;
@@ -237,9 +318,8 @@ int main() {
     }
 
                 if (!(dragging && row == selected_row && col == selected_col)) {
-                    SDL_Texture* tex = getTexture(board[row][col]);
-                    if (tex) {
-                        SDL_RenderCopy(renderer, tex, nullptr, &square);
+                    if (getTexture(board[row][col])) {
+                        SDL_RenderCopy(renderer, getTexture(board[row][col]), nullptr, &square);
                     }
                 }
             }
@@ -247,7 +327,7 @@ int main() {
 
         for (auto& move :  valid_moves) {
             int centerX = move.second * cell_size + cell_size / 2;
-            int centerY = move. first * cell_size + cell_size / 2;
+            int centerY = move.first * cell_size + cell_size / 2;
 
             if (board[move.first][move.second] == 0) {
                 filledCircleRGBA(renderer, centerX, centerY, cell_size / 6, 0, 0, 0, 80);
@@ -258,7 +338,7 @@ int main() {
 
         if (dragging && piece != 0) {
             SDL_Rect dragRect = {drag_x - cell_size/2, drag_y - cell_size/2, cell_size, cell_size};
-            SDL_RenderCopy(renderer, getTexture(piece), NULL, &dragRect);
+            SDL_RenderCopy(renderer, getTexture(piece), nullptr, &dragRect);
         }
 
         SDL_RenderPresent(renderer);

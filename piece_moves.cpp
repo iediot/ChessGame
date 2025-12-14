@@ -5,14 +5,13 @@
 #include "piece_moves.h"
 
 #include <vector>
-#include <math.h>
-#include <setjmp.h>
+#include <cmath>
+#include <csetjmp>
 
 std::vector<std::pair<int, int>> getValidMoves(int board[8][8], int row, int col) {
     int piece = board[row][col];
-    int type = abs(piece);
 
-    switch (type)
+    switch (abs(piece))
     {
     case 1:
         return get_pawn_moves(board, row, col, piece > 0);
@@ -36,24 +35,24 @@ std::vector<std::pair<int, int>> get_pawn_moves(int board[8][8], int row, int co
 
     if (is_white) {
         if (row - 1 >= 0 && board[row - 1][col] == 0) {
-            valid_moves.push_back({row - 1, col});
+            valid_moves.emplace_back(row - 1, col);
             if (row == 6 && board[row - 2][col] == 0)
-                valid_moves.push_back({row - 2, col});
+                valid_moves.emplace_back(row - 2, col);
         }
         if (col > 0 && row - 1 >= 0 && board[row - 1][col - 1] < 0)
-                valid_moves.push_back({row - 1, col - 1});
+                valid_moves.emplace_back(row - 1, col - 1);
         if (col < 7 && row - 1 >= 0 && board[row - 1][col + 1] < 0)
-                valid_moves.push_back({row - 1, col + 1});
+                valid_moves.emplace_back(row - 1, col + 1);
     } else {
         if (row + 1 <= 7 && board[row + 1][col] == 0) {
-            valid_moves.push_back({row + 1, col});
+            valid_moves.emplace_back(row + 1, col);
             if (row == 1 && board[row + 2][col] == 0)
-                valid_moves.push_back({row + 2, col});
+                valid_moves.emplace_back(row + 2, col);
         }
         if (col > 0 && row + 1 <= 7 && board[row + 1][col - 1] > 0)
-                valid_moves.push_back({row + 1, col - 1});
+                valid_moves.emplace_back(row + 1, col - 1);
         if (col < 7 && row + 1 <= 7 && board[row + 1][col + 1] > 0)
-                valid_moves.push_back({row + 1, col + 1});
+                valid_moves.emplace_back(row + 1, col + 1);
     }
     return valid_moves;
 }
@@ -63,13 +62,13 @@ std::vector<std::pair<int, int>> get_rook_moves(int board[8][8], int row, int co
 
     for (int i = row - 1; i >= 0; i--) {
         if (board[i][col] == 0)
-            valid_moves.push_back({i, col});
+            valid_moves.emplace_back(i, col);
         else if (board[i][col] < 0 && is_white) {
-            valid_moves.push_back({i, col});
+            valid_moves.emplace_back(i, col);
             break;
         }
         else if (board[i][col] > 0 && !is_white) {
-            valid_moves.push_back({i, col});
+            valid_moves.emplace_back(i, col);
             break;
         }
         else
@@ -78,13 +77,13 @@ std::vector<std::pair<int, int>> get_rook_moves(int board[8][8], int row, int co
 
     for (int i = row + 1; i <= 7; i++) {
         if (board[i][col] == 0)
-            valid_moves.push_back({i, col});
+            valid_moves.emplace_back(i, col);
         else if (board[i][col] < 0 && is_white) {
-            valid_moves.push_back({i, col});
+            valid_moves.emplace_back(i, col);
             break;
         }
         else if (board[i][col] > 0 && !is_white) {
-            valid_moves.push_back({i, col});
+            valid_moves.emplace_back(i, col);
             break;
         }
         else
@@ -93,13 +92,13 @@ std::vector<std::pair<int, int>> get_rook_moves(int board[8][8], int row, int co
 
     for (int i = col - 1; i >= 0; i--) {
         if (board[row][i] == 0)
-            valid_moves.push_back({row, i});
+            valid_moves.emplace_back(row, i);
         else if (board[row][i] < 0 && is_white) {
-            valid_moves.push_back({row, i});
+            valid_moves.emplace_back(row, i);
             break;
         }
         else if (board[row][i] > 0 && !is_white) {
-            valid_moves.push_back({row, i});
+            valid_moves.emplace_back(row, i);
             break;
         }
         else
@@ -108,13 +107,13 @@ std::vector<std::pair<int, int>> get_rook_moves(int board[8][8], int row, int co
 
     for (int i = col + 1; i <= 7; i++) {
         if (board[row][i]== 0)
-            valid_moves.push_back({row, i});
+            valid_moves.emplace_back(row, i);
         else if (board[row][i] < 0 && is_white) {
-            valid_moves.push_back({row, i});
+            valid_moves.emplace_back(row, i);
             break;
         }
         else if (board[row][i] > 0 && !is_white) {
-            valid_moves.push_back({row, i});
+            valid_moves.emplace_back(row, i);
             break;
         }
         else
@@ -139,11 +138,11 @@ std::vector<std::pair<int, int>> get_knight_moves(int board[8][8], int row, int 
 
         if (new_row >= 0 && new_row <= 7 && new_col >= 0 && new_col <= 7) {
             if (board[new_row][new_col] == 0)
-                valid_moves.push_back({new_row, new_col});
+                valid_moves.emplace_back(new_row, new_col);
             else if (board[new_row][new_col] < 0 && is_white)
-                valid_moves.push_back({new_row, new_col});
+                valid_moves.emplace_back(new_row, new_col);
             else if (board[new_row][new_col] > 0 && !is_white)
-                valid_moves.push_back({new_row, new_col});
+                valid_moves.emplace_back(new_row, new_col);
         }
     }
 
@@ -155,13 +154,13 @@ std::vector<std::pair<int, int>> get_bishop_moves(int board[8][8], int row, int 
 
     for (int i = 1; row - i >= 0 && col - i >= 0; i++) {
         if (board[row - i][col - i] == 0)
-            valid_moves.push_back({row - i, col - i});
+            valid_moves.emplace_back(row - i, col - i);
         else if (board[row - i][col - i] < 0 && is_white) {
-            valid_moves.push_back({row - i, col - i});
+            valid_moves.emplace_back(row - i, col - i);
             break;
         }
         else if (board[row - i][col - i] > 0 && !is_white) {
-            valid_moves.push_back({row - i, col - i});
+            valid_moves.emplace_back(row - i, col - i);
             break;
         }
         else
@@ -170,13 +169,13 @@ std::vector<std::pair<int, int>> get_bishop_moves(int board[8][8], int row, int 
 
     for (int i = 1; row - i >= 0 && col + i <= 7; i++) {
         if (board[row - i][col + i] == 0)
-            valid_moves.push_back({row - i, col + i});
+            valid_moves.emplace_back(row - i, col + i);
         else if (board[row - i][col + i] < 0 && is_white) {
-            valid_moves.push_back({row - i, col + i});
+            valid_moves.emplace_back(row - i, col + i);
             break;
         }
         else if (board[row - i][col + i] > 0 && !is_white) {
-            valid_moves.push_back({row - i, col + i});
+            valid_moves.emplace_back(row - i, col + i);
             break;
         }
         else
@@ -185,13 +184,13 @@ std::vector<std::pair<int, int>> get_bishop_moves(int board[8][8], int row, int 
 
     for (int i = 1; row + i <= 7 && col - i >= 0; i++) {
         if (board[row + i][col - i] == 0)
-            valid_moves.push_back({row + i, col - i});
+            valid_moves.emplace_back(row + i, col - i);
         else if (board[row + i][col - i] < 0 && is_white) {
-            valid_moves.push_back({row + i, col - i});
+            valid_moves.emplace_back(row + i, col - i);
             break;
         }
         else if (board[row + i][col - i] > 0 && !is_white) {
-            valid_moves.push_back({row + i, col - i});
+            valid_moves.emplace_back(row + i, col - i);
             break;
         }
         else
@@ -200,13 +199,13 @@ std::vector<std::pair<int, int>> get_bishop_moves(int board[8][8], int row, int 
 
     for (int i = 1; row + i <= 7 && col + i <= 7; i++) {
         if (board[row + i][col + i] == 0)
-            valid_moves.push_back({row + i, col + i});
+            valid_moves.emplace_back(row + i, col + i);
         else if (board[row + i][col + i] < 0 && is_white) {
-            valid_moves.push_back({row + i, col + i});
+            valid_moves.emplace_back(row + i, col + i);
             break;
         }
         else if (board[row + i][col + i] > 0 && !is_white) {
-            valid_moves.push_back({row + i, col + i});
+            valid_moves.emplace_back(row + i, col + i);
             break;
         }
         else
@@ -239,11 +238,11 @@ std::vector<std::pair<int, int>> get_king_moves(int board[8][8], int row, int co
 
         if (new_row >= 0 && new_row <= 7 && new_col >= 0 && new_col <= 7) {
             if (board[new_row][new_col] == 0 && !attacked_square)
-                    valid_moves.push_back({new_row, new_col});
+                valid_moves.emplace_back(new_row, new_col);
             else if (board[new_row][new_col] < 0 && is_white && !attacked_square)
-                valid_moves.push_back({new_row, new_col});
+                valid_moves.emplace_back(new_row, new_col);
             else if (board[new_row][new_col] > 0 && !is_white && !attacked_square)
-                valid_moves.push_back({new_row, new_col});
+                valid_moves.emplace_back(new_row, new_col);
         }
     }
 
@@ -349,4 +348,46 @@ bool is_square_attacked(int board[8][8], int row, int col, bool by_white) {
         }
     }
     return false;
+}
+
+bool can_castle (int board[8][8], bool is_white, bool queenside, bool can_castle_queenside, bool can_castle_kingside) {
+    bool attacker_is_white = !is_white;
+
+    if (is_white) {
+        if (queenside) {
+            if (!can_castle_queenside) return false;
+            if (board[7][3] != 0 || board[7][2] != 0 || board[7][1] != 0) return false;
+            if (board[7][0] != 2) return false;
+            if (is_square_attacked(board, 7, 4, attacker_is_white)) return false;
+            if (is_square_attacked(board, 7, 3, attacker_is_white)) return false;
+            if (is_square_attacked(board, 7, 2, attacker_is_white)) return false;
+            return true;
+        } else {
+            if (!can_castle_kingside) return false;
+            if (board[7][5] != 0 || board[7][6] != 0) return false;
+            if (board[7][7] != 2) return false;
+            if (is_square_attacked(board, 7, 4, attacker_is_white)) return false;
+            if (is_square_attacked(board, 7, 5, attacker_is_white)) return false;
+            if (is_square_attacked(board, 7, 6, attacker_is_white)) return false;
+            return true;
+        }
+    } else {
+        if (queenside) {
+            if (!can_castle_queenside) return false;
+            if (board[0][3] != 0 || board[0][2] != 0 || board[0][1] != 0) return false;
+            if (board[0][0] != -2) return false;
+            if (is_square_attacked(board, 0, 4, attacker_is_white)) return false;
+            if (is_square_attacked(board, 0, 3, attacker_is_white)) return false;
+            if (is_square_attacked(board, 0, 2, attacker_is_white)) return false;
+            return true;
+        } else {
+            if (!can_castle_kingside) return false;
+            if (board[0][5] != 0 || board[0][6] != 0) return false;
+            if (board[0][7] != -2) return false;
+            if (is_square_attacked(board, 0, 4, attacker_is_white)) return false;
+            if (is_square_attacked(board, 0, 5, attacker_is_white)) return false;
+            if (is_square_attacked(board, 0, 6, attacker_is_white)) return false;
+            return true;
+        }
+    }
 }
