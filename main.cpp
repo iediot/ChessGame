@@ -97,6 +97,13 @@ int main()
         }
 
         while (SDL_PollEvent(&e)) {
+            for (int i = 0; i <= 7; i++) {
+                if (board [0][i] == 1)
+                    board[0][i] = 5;
+                if (board[7][i] == -1)
+                    board[7][i] == -5;
+            }
+
             if (e.type == SDL_QUIT)
                 running = false;
 
