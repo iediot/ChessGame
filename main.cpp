@@ -126,6 +126,19 @@ int main()
                         auto prev_black_king = black_king_pos;
                         int captured_piece = board[row][col];
 
+                        if (std::abs(piece) == 1 && en_passant_able && board[row][col] == 0 && col == en_passant_col) {
+                            if (piece > 0 && !en_passant_is_white && row == en_passant_row - 1 &&
+                                board[en_passant_row][en_passant_col] == -1) {
+                                captured_piece = board[en_passant_row][en_passant_col];
+                                board[en_passant_row][en_passant_col] = 0;
+                            }
+                            else if (piece < 0 && en_passant_is_white && row == en_passant_row + 1 &&
+                                     board[en_passant_row][en_passant_col] == 1) {
+                                captured_piece = board[en_passant_row][en_passant_col];
+                                board[en_passant_row][en_passant_col] = 0;
+                            }
+                        }
+
                         board[selected_row][selected_col] = 0;
                         board[row][col] = piece;
 
@@ -134,17 +147,6 @@ int main()
                                 white_king_pos = {row, col};
                             else
                                 black_king_pos = {row, col};
-                        }
-
-                        if (std::abs(piece) == 1 && en_passant_able)
-                        {
-                            if (piece > 0 && !en_passant_is_white) {
-                                if (row == (en_passant_row - 1))
-                                    board[en_passant_row][en_passant_col] = 0;
-                            } else if (piece < 0 && en_passant_is_white) {
-                                if (row == (en_passant_row + 1))
-                                    board[en_passant_row][en_passant_col] = 0;
-                            }
                         }
 
                         bool mover_in_check;
@@ -275,6 +277,18 @@ int main()
                         auto prev_black_king = black_king_pos;
                         int captured_piece = board[drop_row][drop_col];
 
+                        if (std::abs(piece) == 1 && en_passant_able && board[drop_row][drop_col] == 0 && drop_col == en_passant_col) {
+                            if (piece > 0 && !en_passant_is_white && drop_row == en_passant_row - 1 &&
+                                board[en_passant_row][en_passant_col] == -1) {
+                                captured_piece = board[en_passant_row][en_passant_col];
+                                board[en_passant_row][en_passant_col] = 0;
+                            } else if (piece < 0 && en_passant_is_white && drop_row == en_passant_row + 1 &&
+                                           board[en_passant_row][en_passant_col] == 1) {
+                                captured_piece = board[en_passant_row][en_passant_col];
+                                board[en_passant_row][en_passant_col] = 0;
+                            }
+                        }
+
                         board[selected_row][selected_col] = 0;
                         board[drop_row][drop_col] = piece;
 
@@ -283,17 +297,6 @@ int main()
                                 white_king_pos = {drop_row, drop_col};
                             else
                                 black_king_pos = {drop_row, drop_col};
-                        }
-
-                        if (std::abs(piece) == 1 && en_passant_able)
-                        {
-                            if (piece > 0 && !en_passant_is_white) {
-                                if (drop_row == (en_passant_row - 1))
-                                    board[en_passant_row][en_passant_col] = 0;
-                            } else if (piece < 0 && en_passant_is_white) {
-                                if (drop_row == (en_passant_row + 1))
-                                    board[en_passant_row][en_passant_col] = 0;
-                            }
                         }
 
                         bool mover_in_check;
