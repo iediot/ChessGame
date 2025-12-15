@@ -78,6 +78,10 @@ int main()
     } castling;
     bool is_white_checked = false;
     bool is_black_checked = false;
+    bool en_passant_able = false;
+    bool en_passant_is_white;
+    int en_passant_row;
+    int en_passant_col;
 
     bool running = true;
     while (running) {
@@ -125,6 +129,17 @@ int main()
                                 black_king_pos = {row, col};
                         }
 
+                        if (std::abs(piece) == 1 && en_passant_able)
+                        {
+                            if (piece > 0 && !en_passant_is_white) {
+                                if (row == (en_passant_row - 1))
+                                    board[en_passant_row][en_passant_col] = 0;
+                            } else if (piece < 0 && en_passant_is_white) {
+                                if (row == (en_passant_row + 1))
+                                    board[en_passant_row][en_passant_col] = 0;
+                            }
+                        }
+
                         bool mover_in_check;
                         if (white_turn) {
                             mover_in_check = is_square_attacked(board,
@@ -168,6 +183,15 @@ int main()
                         }
                     }
 
+                    if (std::abs(piece) == 1 && std::abs(row - selected_row) == 2) {
+                        en_passant_able = true;
+                        en_passant_row = row;
+                        en_passant_col = col;
+                        en_passant_is_white = piece > 0;
+                    } else if (en_passant_is_white == white_turn) {
+                        en_passant_able = false;
+                    }
+
                     piece = 0;
                     selected_row = -1;
                     selected_col = -1;
@@ -199,6 +223,19 @@ int main()
                                 if (can_castle(board, false, false,
                                 false, castling.black_can_castle_kingside))
                                     valid_moves.emplace_back(0, 6);
+                            }
+                        }
+
+                        if (std::abs(piece) == 1 && en_passant_able)
+                        {
+                            if (piece > 0 && !en_passant_is_white) {
+                                if (selected_row == en_passant_row &&
+                                    std::abs(selected_col - en_passant_col) == 1)
+                                    valid_moves.emplace_back(selected_row - 1, en_passant_col);
+                            } else if (piece < 0 && en_passant_is_white) {
+                                if (selected_row == en_passant_row &&
+                                    std::abs(selected_col - en_passant_col) == 1)
+                                    valid_moves.emplace_back(selected_row + 1, en_passant_col);
                             }
                         }
                     }
@@ -239,6 +276,17 @@ int main()
                                 white_king_pos = {drop_row, drop_col};
                             else
                                 black_king_pos = {drop_row, drop_col};
+                        }
+
+                        if (std::abs(piece) == 1 && en_passant_able)
+                        {
+                            if (piece > 0 && !en_passant_is_white) {
+                                if (drop_row == (en_passant_row - 1))
+                                    board[en_passant_row][en_passant_col] = 0;
+                            } else if (piece < 0 && en_passant_is_white) {
+                                if (drop_row == (en_passant_row + 1))
+                                    board[en_passant_row][en_passant_col] = 0;
+                            }
                         }
 
                         bool mover_in_check;
@@ -284,6 +332,28 @@ int main()
                         }
                     }
 
+                    if (std::abs(piece) == 1 && en_passant_able)
+                    {
+                        if (piece > 0 && !en_passant_is_white) {
+                            if (selected_row == en_passant_row &&
+                                std::abs(selected_col - en_passant_col) == 1)
+                                valid_moves.emplace_back(selected_row - 1, en_passant_col);
+                        } else if (piece < 0 && en_passant_is_white) {
+                            if (selected_row == en_passant_row &&
+                                std::abs(selected_col - en_passant_col) == 1)
+                                valid_moves.emplace_back(selected_row + 1, en_passant_col);
+                        }
+                    }
+
+                    if (std::abs(piece) == 1 && std::abs(drop_row - selected_row) == 2) {
+                        en_passant_able = true;
+                        en_passant_row = drop_row;
+                        en_passant_col = drop_col;
+                        en_passant_is_white = piece > 0;
+                    } else  if (en_passant_is_white == white_turn) {
+                        en_passant_able = false;
+                    }
+
                     piece = 0;
                     selected_row = -1;
                     selected_col = -1;
@@ -326,13 +396,13 @@ int main()
         }
 
         for (auto& move :  valid_moves) {
-            int centerX = move.second * cell_size + cell_size / 2;
-            int centerY = move.first * cell_size + cell_size / 2;
+            int center_x = move.second * cell_size + cell_size / 2;
+            int center_y = move.first * cell_size + cell_size / 2;
 
             if (board[move.first][move.second] == 0) {
-                filledCircleRGBA(renderer, centerX, centerY, cell_size / 6, 0, 0, 0, 80);
+                filledCircleRGBA(renderer, center_x, center_y, cell_size / 6, 0, 0, 0, 80);
             } else {
-                filledCircleRGBA(renderer, centerX, centerY, cell_size / 2 - 2, 0, 0, 0, 80);
+                filledCircleRGBA(renderer, center_x, center_y, cell_size / 2 - 2, 0, 0, 0, 80);
             }
         }
 
