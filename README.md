@@ -1,12 +1,10 @@
 ```text
 Chess game personal project:
-A chess game that allows all the basic functionality of a real chess game,
-including more complex moves such as castling, en passant, and pawn
-auto-promoting to queens.
+A chess game that allows all the basic functionality of a real chess game, including more complex
+moves such as castling, en passant, and pawn auto-promoting to queens.
 
-I would have liked to add choice-based promoting,
-but I envisioned it in a way that would require an overlay that presents
-the player with the options, and that seemed like a lot of work and I
+I would have liked to add choice-based promoting, but I envisioned it in a way that would require
+an overlay that presents the player with the options, and that seemed like a lot of work and I
 kind of grew tired of it.
 
 The project also includes a makefile that makes it easier to run.
